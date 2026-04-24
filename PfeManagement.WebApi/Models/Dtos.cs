@@ -5,13 +5,17 @@ namespace PfeManagement.WebApi.Models
 {
     // ===== Auth DTOs =====
 
-    public class StudentRegistrationDto
+    public abstract class UserRegistrationDto
     {
         public string FullName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
-        public UserRole Role { get; set; } = UserRole.Student;
+        public UserRole Role { get; set; }
+    }
+
+    public class StudentRegistrationDto : UserRegistrationDto
+    {
         public string Cin { get; set; } = string.Empty;
         public string StudentIdCardIMG { get; set; } = string.Empty;
         public string CompanyName { get; set; } = string.Empty;
@@ -19,27 +23,32 @@ namespace PfeManagement.WebApi.Models
         public DegreeType DegreeType { get; set; }
         public Guid CompSupervisorId { get; set; }
         public Guid UniSupervisorId { get; set; }
+        
+        public StudentRegistrationDto()
+        {
+            Role = UserRole.Student;
+        }
     }
 
-    public class CompanySupervisorRegistrationDto
+    public class CompanySupervisorRegistrationDto : UserRegistrationDto
     {
-        public string FullName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string PhoneNumber { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public UserRole Role { get; set; } = UserRole.CompSupervisor;
         public string CompanyName { get; set; } = string.Empty;
         public string BadgeIMG { get; set; } = string.Empty;
+        
+        public CompanySupervisorRegistrationDto()
+        {
+            Role = UserRole.CompSupervisor;
+        }
     }
 
-    public class UniversitySupervisorRegistrationDto
+    public class UniversitySupervisorRegistrationDto : UserRegistrationDto
     {
-        public string FullName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string PhoneNumber { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public UserRole Role { get; set; } = UserRole.UniSupervisor;
         public string BadgeIMG { get; set; } = string.Empty;
+        
+        public UniversitySupervisorRegistrationDto()
+        {
+            Role = UserRole.UniSupervisor;
+        }
     }
 
     public class LoginDto

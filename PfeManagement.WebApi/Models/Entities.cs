@@ -79,6 +79,30 @@ namespace PfeManagement.WebApi.Models
         public virtual ICollection<Sprint> Sprints { get; set; } = new List<Sprint>();
         public virtual ICollection<Report> Reports { get; set; } = new List<Report>();
         public virtual ICollection<Meeting> Meetings { get; set; } = new List<Meeting>();
+
+        // Domain Logic (Information Expert)
+        public double CalculateProgress()
+        {
+            int totalTasks = 0;
+            int completedTasks = 0;
+
+            foreach (var sprint in Sprints)
+            {
+                foreach (var us in sprint.UserStories)
+                {
+                    foreach (var task in us.Tasks)
+                    {
+                        totalTasks++;
+                        if (task.Status == TaskItemStatus.Done)
+                        {
+                            completedTasks++;
+                        }
+                    }
+                }
+            }
+
+            return totalTasks == 0 ? 0 : (double)completedTasks / totalTasks * 100;
+        }
     }
 
     public class Sprint

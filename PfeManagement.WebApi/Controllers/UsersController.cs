@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PfeManagement.WebApi.Data;
-using PfeManagement.WebApi.Helpers;
+using PfeManagement.WebApi.Interfaces;
 
 namespace PfeManagement.WebApi.Controllers
 {
@@ -15,10 +15,12 @@ namespace PfeManagement.WebApi.Controllers
     public class UsersController : ControllerBase
     {
         private readonly AppDbContext _db;
+        private readonly IPasswordHasher _hasher;
 
-        public UsersController(AppDbContext db)
+        public UsersController(AppDbContext db, IPasswordHasher hasher)
         {
             _db = db;
+            _hasher = hasher;
         }
 
         [HttpGet("supervisors/company")]
@@ -76,10 +78,10 @@ namespace PfeManagement.WebApi.Controllers
             var user = await _db.Users.FindAsync(userId.Value);
             if (user == null) return NotFound(new { success = false, message = "User not found" });
 
-            if (!PasswordHelper.VerifyPassword(request.CurrentPassword, user.PasswordHash))
+            if (!_hasher.VerifyPassword(request.CurrentPassword, user.PasswordHash))
                 return BadRequest(new { success = false, message = "Current password is incorrect" });
 
-            user.PasswordHash = PasswordHelper.HashPassword(request.NewPassword);
+            user.PasswordHash = _hasher.HashPassword(request.NewPassword);
             await _db.SaveChangesAsync();
 
             return Ok(new { success = true, message = "Password updated successfully" });

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Skymi\\Videos\\backend dotnet na7it lpatterns\\PfeManagement.WebApi\\PfeManagement.WebApi.csproj": {}
+    "C:\\Users\\Skymi\\Videos\\backend dotnet na7it lpatterns\\working project\\PfeManagement.WebApi\\PfeManagement.WebApi.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Skymi\\Videos\\backend dotnet na7it lpatterns\\PfeManagement.WebApi\\PfeManagement.WebApi.csproj": {
+    "C:\\Users\\Skymi\\Videos\\backend dotnet na7it lpatterns\\working project\\PfeManagement.WebApi\\PfeManagement.WebApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Skymi\\Videos\\backend dotnet na7it lpatterns\\PfeManagement.WebApi\\PfeManagement.WebApi.csproj",
+        "projectUniqueName": "C:\\Users\\Skymi\\Videos\\backend dotnet na7it lpatterns\\working project\\PfeManagement.WebApi\\PfeManagement.WebApi.csproj",
         "projectName": "PfeManagement.WebApi",
-        "projectPath": "C:\\Users\\Skymi\\Videos\\backend dotnet na7it lpatterns\\PfeManagement.WebApi\\PfeManagement.WebApi.csproj",
+        "projectPath": "C:\\Users\\Skymi\\Videos\\backend dotnet na7it lpatterns\\working project\\PfeManagement.WebApi\\PfeManagement.WebApi.csproj",
         "packagesPath": "C:\\Users\\Skymi\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Skymi\\Videos\\backend dotnet na7it lpatterns\\PfeManagement.WebApi\\obj\\",
+        "outputPath": "C:\\Users\\Skymi\\Videos\\backend dotnet na7it lpatterns\\working project\\PfeManagement.WebApi\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

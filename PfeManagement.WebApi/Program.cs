@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using PfeManagement.WebApi.Data;
+using PfeManagement.WebApi.Interfaces;
+using PfeManagement.WebApi.Services;
 using AspNetCoreRateLimit;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +19,10 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
+
+// Dependency Injection for Ben Tili's work
+builder.Services.AddScoped<IPasswordHasher, PasswordHasherService>();
+builder.Services.AddScoped<INotificationService, EmailNotificationAdapter>();
 
 // DbContext - just register it directly, no repository/unit of work layers
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "hbED96liHnM=",
+  "dgSpecHash": "5exmVsRmYJ8=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Skymi\\Videos\\backend dotnet na7it lpatterns\\PfeManagement.WebApi\\PfeManagement.WebApi.csproj",
+  "projectFilePath": "C:\\Users\\Skymi\\Videos\\backend dotnet na7it lpatterns\\working project\\PfeManagement.WebApi\\PfeManagement.WebApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Skymi\\.nuget\\packages\\aspnetcoreratelimit\\5.0.0\\aspnetcoreratelimit.5.0.0.nupkg.sha512",
     "C:\\Users\\Skymi\\.nuget\\packages\\bcrypt.net-next\\4.1.0\\bcrypt.net-next.4.1.0.nupkg.sha512",
