@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -8,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using PfeManagement.WebApi.Data;
 using PfeManagement.WebApi.Helpers;
+using PfeManagement.WebApi.Interfaces;
+using PfeManagement.WebApi.Factories;
 using PfeManagement.WebApi.Models;
 
 namespace PfeManagement.WebApi.Controllers
@@ -18,12 +21,24 @@ namespace PfeManagement.WebApi.Controllers
     {
         private readonly AppDbContext _db;
         private readonly IConfiguration _config;
+        private readonly IPasswordHasher _hasher;
+        private readonly INotificationService _notificationService;
+        private readonly Dictionary<UserRole, UserFactory> _factories;
         private static readonly ConcurrentDictionary<string, (Guid UserId, DateTime ExpiresAt)> RefreshTokens = new();
 
-        public AuthController(AppDbContext db, IConfiguration config)
+        public AuthController(AppDbContext db, IConfiguration config, IPasswordHasher hasher, INotificationService notificationService)
         {
             _db = db;
             _config = config;
+            _hasher = hasher;
+            _notificationService = notificationService;
+            
+            _factories = new Dictionary<UserRole, UserFactory>
+            {
+                { UserRole.Student, new StudentFactory() },
+                { UserRole.CompSupervisor, new CompanySupervisorFactory() },
+                { UserRole.UniSupervisor, new UniversitySupervisorFactory() }
+            };
         }
 
         [HttpPost("signup/student")]
@@ -37,23 +52,11 @@ namespace PfeManagement.WebApi.Controllers
                 if (exists)
                     return BadRequest(new { success = false, message = "Email already registered" });
 
-                // Create student directly - no factory pattern needed
-                var student = new Student
-                {
-                    FullName = dto.FullName,
-                    Email = dto.Email,
-                    PhoneNumber = dto.PhoneNumber,
-                    Role = UserRole.Student,
-                    PasswordHash = PasswordHelper.HashPassword(dto.Password),
-                    VerificationToken = Guid.NewGuid().ToString("N"),
-                    Cin = dto.Cin,
-                    StudentIdCardIMG = dto.StudentIdCardIMG,
-                    CompanyName = dto.CompanyName,
-                    Degree = dto.Degree,
-                    DegreeType = dto.DegreeType,
-                    CompSupervisorId = dto.CompSupervisorId,
-                    UniSupervisorId = dto.UniSupervisorId
-                };
+                if (!_factories.TryGetValue(dto.Role, out var factory))
+                    throw new Exception("Invalid role specified");
+
+                var student = factory.CreateAndRegister(dto, _hasher) as Student;
+                if (student == null) throw new Exception("Failed to create student");
 
                 _db.Students.Add(student);
                 await _db.SaveChangesAsync();
@@ -61,7 +64,7 @@ namespace PfeManagement.WebApi.Controllers
                 // Try to send verification email
                 try
                 {
-                    await EmailHelper.SendVerificationEmail(student.Email, student.FullName, student.VerificationToken!, _config);
+                    await _notificationService.SendVerificationEmailAsync(student.Email, student.FullName, student.VerificationToken!);
                 }
                 catch { }
 
@@ -93,25 +96,18 @@ namespace PfeManagement.WebApi.Controllers
                 if (exists)
                     return BadRequest(new { success = false, message = "Email already registered" });
 
-                // Create company supervisor directly
-                var supervisor = new CompanySupervisor
-                {
-                    FullName = dto.FullName,
-                    Email = dto.Email,
-                    PhoneNumber = dto.PhoneNumber,
-                    Role = UserRole.CompSupervisor,
-                    PasswordHash = PasswordHelper.HashPassword(dto.Password),
-                    VerificationToken = Guid.NewGuid().ToString("N"),
-                    CompanyName = dto.CompanyName,
-                    BadgeIMG = dto.BadgeIMG
-                };
+                if (!_factories.TryGetValue(dto.Role, out var factory))
+                    throw new Exception("Invalid role specified");
+
+                var supervisor = factory.CreateAndRegister(dto, _hasher) as CompanySupervisor;
+                if (supervisor == null) throw new Exception("Failed to create supervisor");
 
                 _db.CompanySupervisors.Add(supervisor);
                 await _db.SaveChangesAsync();
 
                 try
                 {
-                    await EmailHelper.SendVerificationEmail(supervisor.Email, supervisor.FullName, supervisor.VerificationToken!, _config);
+                    await _notificationService.SendVerificationEmailAsync(supervisor.Email, supervisor.FullName, supervisor.VerificationToken!);
                 }
                 catch { }
 
@@ -142,24 +138,18 @@ namespace PfeManagement.WebApi.Controllers
                 if (exists)
                     return BadRequest(new { success = false, message = "Email already registered" });
 
-                // Create university supervisor directly
-                var supervisor = new UniversitySupervisor
-                {
-                    FullName = dto.FullName,
-                    Email = dto.Email,
-                    PhoneNumber = dto.PhoneNumber,
-                    Role = UserRole.UniSupervisor,
-                    PasswordHash = PasswordHelper.HashPassword(dto.Password),
-                    VerificationToken = Guid.NewGuid().ToString("N"),
-                    BadgeIMG = dto.BadgeIMG
-                };
+                if (!_factories.TryGetValue(dto.Role, out var factory))
+                    throw new Exception("Invalid role specified");
+
+                var supervisor = factory.CreateAndRegister(dto, _hasher) as UniversitySupervisor;
+                if (supervisor == null) throw new Exception("Failed to create supervisor");
 
                 _db.UniversitySupervisors.Add(supervisor);
                 await _db.SaveChangesAsync();
 
                 try
                 {
-                    await EmailHelper.SendVerificationEmail(supervisor.Email, supervisor.FullName, supervisor.VerificationToken!, _config);
+                    await _notificationService.SendVerificationEmailAsync(supervisor.Email, supervisor.FullName, supervisor.VerificationToken!);
                 }
                 catch { }
 
@@ -215,7 +205,7 @@ namespace PfeManagement.WebApi.Controllers
             try
             {
                 var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
-                if (user == null || !PasswordHelper.VerifyPassword(dto.Password, user.PasswordHash))
+                if (user == null || !_hasher.VerifyPassword(dto.Password, user.PasswordHash))
                 {
                     throw new Exception("Invalid email or password");
                 }
@@ -309,7 +299,7 @@ namespace PfeManagement.WebApi.Controllers
 
                 try
                 {
-                    await EmailHelper.SendPasswordResetEmail(user.Email, user.FullName, user.PasswordResetToken, _config);
+                    await _notificationService.SendPasswordResetEmailAsync(user.Email, user.FullName, user.PasswordResetToken);
                 }
                 catch { }
             }
@@ -337,7 +327,7 @@ namespace PfeManagement.WebApi.Controllers
                     throw new Exception("Invalid or expired reset token");
                 }
 
-                user.PasswordHash = PasswordHelper.HashPassword(dto.NewPassword);
+                user.PasswordHash = _hasher.HashPassword(dto.NewPassword);
                 user.PasswordResetToken = null;
                 user.PasswordResetExpires = null;
                 await _db.SaveChangesAsync();

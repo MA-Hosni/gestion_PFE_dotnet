@@ -4,10 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using PfeManagement.WebApi.Data;
-using PfeManagement.WebApi.Helpers;
 using PfeManagement.WebApi.Models;
+using PfeManagement.WebApi.Interfaces;
 
 namespace PfeManagement.WebApi.Controllers
 {
@@ -16,12 +15,12 @@ namespace PfeManagement.WebApi.Controllers
     public class TasksController : ControllerBase
     {
         private readonly AppDbContext _db;
-        private readonly IConfiguration _config;
+        private readonly INotificationService _notificationService;
 
-        public TasksController(AppDbContext db, IConfiguration config)
+        public TasksController(AppDbContext db, INotificationService notificationService)
         {
             _db = db;
-            _config = config;
+            _notificationService = notificationService;
         }
 
         [Authorize]
@@ -117,11 +116,10 @@ namespace PfeManagement.WebApi.Controllers
                     {
                         try
                         {
-                            await EmailHelper.SendEmail(
+                            await _notificationService.SendAsync(
                                 "supervisor@pfemanagement.com",
                                 "Task Completed",
-                                $"Task {task.Id} was marked as Done.",
-                                _config);
+                                $"Task {task.Id} was marked as Done.");
                         }
                         catch { }
                     }
