@@ -58,7 +58,7 @@ namespace PfeManagement.Application.Interfaces
 
     public interface ITaskService
     {
-        Task<TaskResponseDto> CreateTaskAsync(CreateTaskDto dto);
+        Task<TaskResponseDto> CreateTaskAsync(CreateTaskDto dto, Guid createdByUserId);
         Task<IEnumerable<TaskResponseDto>> GetTasksAsync(Guid userStoryId);
         Task<TaskResponseDto> UpdateTaskAsync(Guid taskId, UpdateTaskDto dto, Guid modifiedByUserId);
         Task DeleteTaskAsync(Guid taskId);

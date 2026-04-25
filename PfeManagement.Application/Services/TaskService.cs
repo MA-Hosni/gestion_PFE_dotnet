@@ -21,7 +21,7 @@ namespace PfeManagement.Application.Services
             _eventDispatcher = eventDispatcher;
         }
 
-        public async Task<TaskResponseDto> CreateTaskAsync(CreateTaskDto dto)
+        public async Task<TaskResponseDto> CreateTaskAsync(CreateTaskDto dto, Guid createdByUserId)
         {
             var task = new TaskItem
             {
@@ -35,6 +35,10 @@ namespace PfeManagement.Application.Services
 
             await _unitOfWork.Tasks.AddAsync(task);
             await _unitOfWork.SaveChangesAsync();
+
+            await _eventDispatcher.DispatchAsync(
+                new TaskCreatedEvent(task.Id, task.Title, task.AssignedToId, createdByUserId)
+            );
 
             return MapToDto(task);
         }
