@@ -20,13 +20,6 @@ namespace PfeManagement.Application.Services
 
         public async Task<UserStoryResponseDto> CreateUserStoryAsync(CreateUserStoryDto dto)
         {
-            var sprint = await _unitOfWork.Sprints.GetByIdAsync(dto.SprintId);
-            if (sprint == null) throw new Exception("Sprint not found");
-
-            // OCL UserStoriesWithinSprint - due date must be within sprint dates
-            var dueDate = NormalizeUtc(dto.DueDate);
-            sprint.ValidateUserStoryDueDate(dueDate);
-
             var userStory = new UserStory
             {
                 StoryName = dto.StoryName,
@@ -59,14 +52,7 @@ namespace PfeManagement.Application.Services
             if (dto.Description != null) userStory.Description = dto.Description;
             if (dto.Priority.HasValue) userStory.Priority = dto.Priority.Value;
             if (dto.StoryPointEstimate.HasValue) userStory.StoryPointEstimate = dto.StoryPointEstimate.Value;
-            
-            if (dto.DueDate.HasValue)
-            {
-                var sprint = await _unitOfWork.Sprints.GetByIdAsync(userStory.SprintId);
-                var dueDate = NormalizeUtc(dto.DueDate.Value);
-                sprint.ValidateUserStoryDueDate(dueDate);
-                userStory.DueDate = dueDate;
-            }
+            if (dto.DueDate.HasValue) userStory.DueDate = NormalizeUtc(dto.DueDate.Value);
 
             await _unitOfWork.UserStories.UpdateAsync(userStory);
             await _unitOfWork.SaveChangesAsync();

@@ -27,7 +27,7 @@ namespace PfeManagement.Application.EventHandlers
             };
 
             await _unitOfWork.TaskHistories.AddAsync(history);
-            await _unitOfWork.SaveChangesAsync();
+            // SaveChanges is typically handled by the caller of the event dispatcher
         }
     }
 }

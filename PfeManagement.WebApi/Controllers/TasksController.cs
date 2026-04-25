@@ -28,10 +28,15 @@ namespace PfeManagement.WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateTask([FromBody] CreateTaskDto dto)
         {
+            var userId = GetCurrentUserId();
+            if (!userId.HasValue)
+            {
+                return Unauthorized(new { success = false, message = "Invalid token or user ID missing." });
+            }
+
             try
             {
-                var createdByUserId = GetCurrentUserId() ?? Guid.Empty;
-                var result = await _taskService.CreateTaskAsync(dto, createdByUserId);
+                var result = await _taskService.CreateTaskAsync(dto, userId.Value);
                 return StatusCode(201, new { success = true, message = "Task created successfully", data = result });
             }
             catch (Exception ex)
@@ -72,11 +77,15 @@ namespace PfeManagement.WebApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTask(Guid id, [FromBody] UpdateTaskDto dto)
         {
+            var userId = GetCurrentUserId();
+            if (!userId.HasValue)
+            {
+                return Unauthorized(new { success = false, message = "Invalid token or user ID missing." });
+            }
+
             try
             {
-                var modifiedByUserId = GetCurrentUserId() ?? Guid.Empty;
-                
-                var result = await _taskService.UpdateTaskAsync(id, dto, modifiedByUserId);
+                var result = await _taskService.UpdateTaskAsync(id, dto, userId.Value);
                 return Ok(new { success = true, message = "Task updated successfully", data = result });
             }
             catch (Exception ex)

@@ -1,65 +1,94 @@
+// ════════════════════════════════════════════════════════════════
+//  EmailNotificationAdapter.cs — APRÈS refactoring avec Singleton
+//  Couche : PfeManagement.Infrastructure
+//  Responsable : Khemissi Nour
+//
+//  NOTE : Ce fichier applique AUSSI le patron GoF Adapter
+//         (adapte MailKit SmtpClient vers INotificationService).
+//         Le Singleton est utilisé pour la configuration email.
+//
+//  AVANT : _config.GetSection("EmailSettings") relu à chaque envoi
+//  APRÈS : AppConfigurationManager.Instance — valeurs en mémoire
+// ════════════════════════════════════════════════════════════════
+
+using System.Threading.Tasks;
 using MailKit.Net.Smtp;
 using MimeKit;
 using MimeKit.Text;
-using System.Threading.Tasks;
 using PfeManagement.Application.Interfaces;
-using Microsoft.Extensions.Configuration;
 
 namespace PfeManagement.Infrastructure.Services
 {
-    // GoF Pattern: Adapter (Adapts MailKit's SmtpClient to our INotificationService Target Interface)
+    // GoF Adapter : adapte MailKit SmtpClient vers INotificationService
     public class EmailNotificationAdapter : INotificationService
     {
-        private readonly IConfiguration _config;
+        // ── Référence vers le Singleton ──────────────────────────
+        // Même instance que JwtTokenService — un seul objet en RAM.
+        private readonly AppConfigurationManager _config;
 
-        public EmailNotificationAdapter(IConfiguration config)
+        public EmailNotificationAdapter()
         {
-            _config = config;
+            _config = AppConfigurationManager.Instance;
         }
 
-        public async Task SendAsync(string recipient, string subject, string body, bool isHtml = true)
+        /// <summary>
+        /// Envoie un email via MailKit (SmtpClient).
+        /// Les paramètres SMTP viennent du Singleton (déjà en RAM).
+        /// </summary>
+        public async Task SendAsync(
+            string recipient,
+            string subject,
+            string body,
+            bool isHtml = true)
         {
-            var emailSettings = _config.GetSection("EmailSettings");
-
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress(emailSettings["FromName"], emailSettings["FromEmail"]));
+
+            // Paramètres lus depuis le Singleton — pas de GetSection()
+            message.From.Add(new MailboxAddress(
+                _config.EmailFromName,
+                _config.EmailFromEmail));
+
             message.To.Add(MailboxAddress.Parse(recipient));
             message.Subject = subject;
-
-            message.Body = new TextPart(isHtml ? TextFormat.Html : TextFormat.Plain)
-            {
-                Text = body
-            };
+            message.Body    = new TextPart(
+                isHtml ? TextFormat.Html : TextFormat.Plain)
+            { Text = body };
 
             using var smtpClient = new SmtpClient();
-            
-            // Connect
+
             await smtpClient.ConnectAsync(
-                emailSettings["Host"], 
-                int.Parse(emailSettings["Port"]!), 
-                bool.Parse(emailSettings["UseSsl"]!));
-                
-            // Authenticate
-            await smtpClient.AuthenticateAsync(emailSettings["Username"], emailSettings["Password"]);
-            
-            // Send
+                _config.EmailHost,
+                _config.EmailPort,
+                _config.EmailUseSsl);
+
+            await smtpClient.AuthenticateAsync(
+                _config.EmailUsername,
+                _config.EmailPassword);
+
             await smtpClient.SendAsync(message);
-            
-            // Disconnect
             await smtpClient.DisconnectAsync(true);
         }
 
-        public async Task SendVerificationEmailAsync(string email, string name, string token)
+        public async Task SendVerificationEmailAsync(
+            string email, string name, string token)
         {
-            // Similar to existing code logic
-            var body = $"Hello {name}, please verify your email using this token: {token}";
-            await SendAsync(email, "Verify Your Email", body);
+            var body = $"Bonjour {name},<br/>" +
+                       $"Veuillez vérifier votre compte avec ce token : " +
+                       $"<strong>{token}</strong>";
+            await SendAsync(email,
+                "Vérification de votre compte — PFE Management",
+                body);
         }
 
-        public async Task SendPasswordResetEmailAsync(string email, string name, string token)
+        public async Task SendPasswordResetEmailAsync(
+            string email, string name, string token)
         {
-            var body = $"Hello {name}, your reset token is: {token}";
-            await SendAsync(email, "Reset Password", body);
+            var body = $"Bonjour {name},<br/>" +
+                       $"Votre token de réinitialisation : " +
+                       $"<strong>{token}</strong>";
+            await SendAsync(email,
+                "Réinitialisation de mot de passe — PFE Management",
+                body);
         }
     }
 }

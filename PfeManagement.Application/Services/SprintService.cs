@@ -27,11 +27,6 @@ namespace PfeManagement.Application.Services
             var existingSprints = await _unitOfWork.Sprints.GetAsync(s => s.ProjectId == projectId);
             var nextIndex = existingSprints.Any() ? existingSprints.Max(s => s.OrderIndex) + 1 : 1;
 
-            // OCL NonOverlappingSprints - no overlap between sprints of the same project
-            var candidateStart = NormalizeUtc(dto.StartDate);
-            var candidateEnd = NormalizeUtc(dto.EndDate);
-            project.ValidateNoOverlappingSprints(existingSprints, candidateStart, candidateEnd);
-
             var sprint = new Sprint
             {
                 Title = dto.Title,
@@ -59,24 +54,10 @@ namespace PfeManagement.Application.Services
             var sprint = await _unitOfWork.Sprints.GetByIdAsync(sprintId);
             if (sprint == null) throw new Exception("Sprint not found");
 
-            var candidateStart = dto.StartDate.HasValue ? NormalizeUtc(dto.StartDate.Value) : sprint.StartDate;
-            var candidateEnd = dto.EndDate.HasValue ? NormalizeUtc(dto.EndDate.Value) : sprint.EndDate;
-
-            if (dto.StartDate.HasValue || dto.EndDate.HasValue)
-            {
-                var project = await _unitOfWork.Projects.GetByIdAsync(sprint.ProjectId);
-                var existingSprints = await _unitOfWork.Sprints.GetAsync(s => s.ProjectId == sprint.ProjectId);
-                project.ValidateNoOverlappingSprints(existingSprints, candidateStart, candidateEnd, sprint.Id);
-
-                // OCL UserStoriesWithinSprint - due date must be within sprint dates
-                var userStories = await _unitOfWork.UserStories.GetAsync(us => us.SprintId == sprint.Id);
-                sprint.ValidateUserStoriesWithinSprint(userStories, candidateStart, candidateEnd);
-            }
-
             if (dto.Title != null) sprint.Title = dto.Title;
             if (dto.Goal != null) sprint.Goal = dto.Goal;
-            if (dto.StartDate.HasValue) sprint.StartDate = candidateStart;
-            if (dto.EndDate.HasValue) sprint.EndDate = candidateEnd;
+            if (dto.StartDate.HasValue) sprint.StartDate = NormalizeUtc(dto.StartDate.Value);
+            if (dto.EndDate.HasValue) sprint.EndDate = NormalizeUtc(dto.EndDate.Value);
 
             await _unitOfWork.Sprints.UpdateAsync(sprint);
             await _unitOfWork.SaveChangesAsync();

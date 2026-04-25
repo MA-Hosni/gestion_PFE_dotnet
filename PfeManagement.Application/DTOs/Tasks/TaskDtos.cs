@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using PfeManagement.Domain.Enums;
 
 namespace PfeManagement.Application.DTOs.Tasks
@@ -31,5 +32,19 @@ namespace PfeManagement.Application.DTOs.Tasks
         public Priority Priority { get; set; }
         public Guid UserStoryId { get; set; }
         public Guid? AssignedToId { get; set; }
+    }
+
+    public class ProjectTaskReportDto
+    {
+        public Guid ProjectId { get; set; }
+        public int TotalTasks { get; set; }
+        public Dictionary<string, int> ByStatus { get; set; } = new();
+    }
+
+    public class SprintTaskReportDto
+    {
+        public Guid SprintId { get; set; }
+        public int TotalTasks { get; set; }
+        public Dictionary<string, int> ByStatus { get; set; } = new();
     }
 }

@@ -3262,42 +3262,35 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Skymi\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\user\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Skymi\\Desktop\\gestion_PFE\\backend dotnet\\PfeManagement.Infrastructure\\PfeManagement.Infrastructure.csproj",
+      "projectUniqueName": "C:\\Users\\user\\gl_backend_dotnet\\PfeManagement.Infrastructure\\PfeManagement.Infrastructure.csproj",
       "projectName": "PfeManagement.Infrastructure",
-      "projectPath": "C:\\Users\\Skymi\\Desktop\\gestion_PFE\\backend dotnet\\PfeManagement.Infrastructure\\PfeManagement.Infrastructure.csproj",
-      "packagesPath": "C:\\Users\\Skymi\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Skymi\\Desktop\\gestion_PFE\\backend dotnet\\PfeManagement.Infrastructure\\obj\\",
+      "projectPath": "C:\\Users\\user\\gl_backend_dotnet\\PfeManagement.Infrastructure\\PfeManagement.Infrastructure.csproj",
+      "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\user\\gl_backend_dotnet\\PfeManagement.Infrastructure\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\Skymi\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net10.0": {
           "targetAlias": "net10.0",
           "projectReferences": {
-            "C:\\Users\\Skymi\\Desktop\\gestion_PFE\\backend dotnet\\PfeManagement.Application\\PfeManagement.Application.csproj": {
-              "projectPath": "C:\\Users\\Skymi\\Desktop\\gestion_PFE\\backend dotnet\\PfeManagement.Application\\PfeManagement.Application.csproj"
+            "C:\\Users\\user\\gl_backend_dotnet\\PfeManagement.Application\\PfeManagement.Application.csproj": {
+              "projectPath": "C:\\Users\\user\\gl_backend_dotnet\\PfeManagement.Application\\PfeManagement.Application.csproj"
             },
-            "C:\\Users\\Skymi\\Desktop\\gestion_PFE\\backend dotnet\\PfeManagement.Domain\\PfeManagement.Domain.csproj": {
-              "projectPath": "C:\\Users\\Skymi\\Desktop\\gestion_PFE\\backend dotnet\\PfeManagement.Domain\\PfeManagement.Domain.csproj"
+            "C:\\Users\\user\\gl_backend_dotnet\\PfeManagement.Domain\\PfeManagement.Domain.csproj": {
+              "projectPath": "C:\\Users\\user\\gl_backend_dotnet\\PfeManagement.Domain\\PfeManagement.Domain.csproj"
             }
           }
         }
@@ -3640,7 +3633,7 @@
       "code": "NU1903",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "Package 'AutoMapper' 12.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x",
+      "message": "Le package 'AutoMapper' 12.0.1 présente une vulnérabilité de gravité élevé(e) connue, https://github.com/advisories/GHSA-rvv3-g6hj-g44x.",
       "libraryId": "AutoMapper",
       "targetGraphs": [
         "net10.0"
