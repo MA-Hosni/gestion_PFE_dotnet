@@ -16,6 +16,7 @@
     </PackageReference>
     <!-- Removed Microsoft.OpenApi -->
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
     <!-- Removed Swashbuckle -->
   </ItemGroup>
 

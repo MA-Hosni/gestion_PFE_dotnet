@@ -5,7 +5,7 @@ using PfeManagement.Domain.Entities;
 
 namespace PfeManagement.Domain.Interfaces
 {
-    public interface IUnitOfWork : ITaskReportDataAccess, IDisposable
+    public interface IUnitOfWork : IDisposable
     {
         IRepository<User> Users { get; }
         IRepository<Student> Students { get; }
@@ -13,9 +13,9 @@ namespace PfeManagement.Domain.Interfaces
         IRepository<UniversitySupervisor> UniversitySupervisors { get; }
         
         IRepository<Project> Projects { get; }
-        new IRepository<Sprint> Sprints { get; }
-        new IRepository<UserStory> UserStories { get; }
-        new IRepository<TaskItem> Tasks { get; }
+        IRepository<Sprint> Sprints { get; }
+        IRepository<UserStory> UserStories { get; }
+        IRepository<TaskItem> Tasks { get; }
         IRepository<TaskHistory> TaskHistories { get; }
         IRepository<Report> Reports { get; }
         IRepository<Meeting> Meetings { get; }

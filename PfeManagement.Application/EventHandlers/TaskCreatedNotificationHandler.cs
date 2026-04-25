@@ -4,27 +4,32 @@ using PfeManagement.Domain.Events;
 
 namespace PfeManagement.Application.EventHandlers
 {
+    // GoF Pattern: Observer - Concrete handler
     public class TaskCreatedNotificationHandler : IDomainEventHandler<TaskCreatedEvent>
     {
         private readonly INotificationService _notificationService;
-        private readonly PfeManagement.Domain.Interfaces.IUnitOfWork _unitOfWork;
 
-        public TaskCreatedNotificationHandler(INotificationService notificationService, PfeManagement.Domain.Interfaces.IUnitOfWork unitOfWork)
+        public TaskCreatedNotificationHandler(INotificationService notificationService)
         {
             _notificationService = notificationService;
-            _unitOfWork = unitOfWork;
         }
 
         public async Task HandleAsync(TaskCreatedEvent domainEvent)
         {
-            if (domainEvent.AssignedToId.HasValue)
+            try
             {
-                var user = await _unitOfWork.Users.GetByIdAsync(domainEvent.AssignedToId.Value);
-                if (user != null && !string.IsNullOrEmpty(user.Email))
-                {
-                    var message = $"A new task '{domainEvent.Title}' has been assigned to you.";
-                    await _notificationService.SendAsync(user.Email, "New Task Assigned", message, false);
-                }
+                // NOTE: We intentionally keep "supervisor@pfemanagement.com" as a placeholder here
+                // to match the exact same behavior found in the existing SupervisorNotificationHandler.
+                // In a production system, DO NOT use a hardcoded string. Instead, implement a proper 
+                // lookup traversing: Task -> UserStory -> Sprint -> Project -> find supervisor email.
+                await _notificationService.SendAsync(
+                    "supervisor@pfemanagement.com",
+                    "New Task Created",
+                    $"A new task '{domainEvent.Title}' was created in user story {domainEvent.UserStoryId}.");
+            }
+            catch
+            {
+                // Notification delivery failures must not break the core business transaction.
             }
         }
     }

@@ -23,7 +23,7 @@ namespace PfeManagement.WebApi.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        [Authorize]
+    [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateProject([FromBody] CreateProjectDto dto)
         {

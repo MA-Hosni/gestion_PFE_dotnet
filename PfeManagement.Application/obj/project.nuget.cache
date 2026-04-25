@@ -1,25 +1,25 @@
 {
   "version": 2,
-  "dgSpecHash": "hsznzpytPvo=",
+  "dgSpecHash": "HIJwHRautfM=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Skymi\\Desktop\\gestion_PFE\\backend dotnet\\PfeManagement.Application\\PfeManagement.Application.csproj",
+  "projectFilePath": "C:\\Users\\user\\gl_backend_dotnet\\PfeManagement.Application\\PfeManagement.Application.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\Skymi\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
-    "C:\\Users\\Skymi\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
-    "C:\\Users\\Skymi\\.nuget\\packages\\fluentvalidation\\12.1.1\\fluentvalidation.12.1.1.nupkg.sha512",
-    "C:\\Users\\Skymi\\.nuget\\packages\\fluentvalidation.dependencyinjectionextensions\\12.1.1\\fluentvalidation.dependencyinjectionextensions.12.1.1.nupkg.sha512",
-    "C:\\Users\\Skymi\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\6.0.0\\microsoft.extensions.dependencyinjection.abstractions.6.0.0.nupkg.sha512",
-    "C:\\Users\\Skymi\\.nuget\\packages\\microsoft.extensions.options\\6.0.0\\microsoft.extensions.options.6.0.0.nupkg.sha512",
-    "C:\\Users\\Skymi\\.nuget\\packages\\microsoft.extensions.primitives\\6.0.0\\microsoft.extensions.primitives.6.0.0.nupkg.sha512"
+    "C:\\Users\\user\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
+    "C:\\Users\\user\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
+    "C:\\Users\\user\\.nuget\\packages\\fluentvalidation\\12.1.1\\fluentvalidation.12.1.1.nupkg.sha512",
+    "C:\\Users\\user\\.nuget\\packages\\fluentvalidation.dependencyinjectionextensions\\12.1.1\\fluentvalidation.dependencyinjectionextensions.12.1.1.nupkg.sha512",
+    "C:\\Users\\user\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\6.0.0\\microsoft.extensions.dependencyinjection.abstractions.6.0.0.nupkg.sha512",
+    "C:\\Users\\user\\.nuget\\packages\\microsoft.extensions.options\\6.0.0\\microsoft.extensions.options.6.0.0.nupkg.sha512",
+    "C:\\Users\\user\\.nuget\\packages\\microsoft.extensions.primitives\\6.0.0\\microsoft.extensions.primitives.6.0.0.nupkg.sha512"
   ],
   "logs": [
     {
       "code": "NU1903",
       "level": "Warning",
-      "message": "Package 'AutoMapper' 12.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x",
-      "projectPath": "C:\\Users\\Skymi\\Desktop\\gestion_PFE\\backend dotnet\\PfeManagement.Application\\PfeManagement.Application.csproj",
+      "message": "Le package 'AutoMapper' 12.0.1 présente une vulnérabilité de gravité élevé(e) connue, https://github.com/advisories/GHSA-rvv3-g6hj-g44x.",
+      "projectPath": "C:\\Users\\user\\gl_backend_dotnet\\PfeManagement.Application\\PfeManagement.Application.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\Skymi\\Desktop\\gestion_PFE\\backend dotnet\\PfeManagement.Application\\PfeManagement.Application.csproj",
+      "filePath": "C:\\Users\\user\\gl_backend_dotnet\\PfeManagement.Application\\PfeManagement.Application.csproj",
       "libraryId": "AutoMapper",
       "targetGraphs": [
         "net10.0"
