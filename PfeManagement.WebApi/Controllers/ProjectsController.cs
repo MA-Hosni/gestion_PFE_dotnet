@@ -4,9 +4,9 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PfeManagement.WebApi.Data;
-using PfeManagement.WebApi.Models;
+using PfeManagement.Application.DTOs.Projects;
+using PfeManagement.Application.Interfaces;
+using PfeManagement.Domain.Interfaces;
 
 namespace PfeManagement.WebApi.Controllers
 {
@@ -14,11 +14,13 @@ namespace PfeManagement.WebApi.Controllers
     [Route("api/project")]
     public class ProjectsController : ControllerBase
     {
-        private readonly AppDbContext _db;
+        private readonly IProjectService _projectService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ProjectsController(AppDbContext db)
+        public ProjectsController(IProjectService projectService, IUnitOfWork unitOfWork)
         {
-            _db = db;
+            _projectService = projectService;
+            _unitOfWork = unitOfWork;
         }
 
         [Authorize]
@@ -33,33 +35,8 @@ namespace PfeManagement.WebApi.Controllers
                     return Unauthorized(new { success = false, message = "Student not authenticated" });
                 }
 
-                var student = await _db.Students.FindAsync(studentId.Value);
-                if (student == null) throw new Exception("Student not found");
-                if (student.ProjectId != null) throw new Exception("Student is already part of a project");
-
-                var project = new Project
-                {
-                    Title = dto.Title,
-                    Description = dto.Description,
-                    StartDate = NormalizeUtc(dto.StartDate),
-                    EndDate = NormalizeUtc(dto.EndDate)
-                };
-
-                project.Contributors.Add(student);
-
-                foreach (var contributorId in dto.Contributors)
-                {
-                    var contributor = await _db.Students.FindAsync(contributorId);
-                    if (contributor != null && contributor.Id != studentId.Value && contributor.ProjectId == null)
-                    {
-                        project.Contributors.Add(contributor);
-                    }
-                }
-
-                _db.Projects.Add(project);
-                await _db.SaveChangesAsync();
-
-                return StatusCode(201, new { success = true, message = "Project created successfully", data = MapToDto(project) });
+                var result = await _projectService.CreateProjectAsync(dto, studentId.Value);
+                return StatusCode(201, new { success = true, message = "Project created successfully", data = result });
             }
             catch (Exception ex)
             {
@@ -80,10 +57,8 @@ namespace PfeManagement.WebApi.Controllers
                     return NotFound(new { success = false, message = "Project not found for current user" });
                 }
 
-                var project = await _db.Projects.Include(p => p.Contributors).FirstOrDefaultAsync(p => p.Id == projectId.Value);
-                if (project == null) throw new Exception("Project not found");
-
-                return Ok(new { success = true, message = "Project fetched successfully", data = MapToDto(project) });
+                var result = await _projectService.GetProjectAsync(projectId.Value);
+                return Ok(new { success = true, message = "Project fetched successfully", data = result });
             }
             catch (Exception ex)
             {
@@ -104,17 +79,8 @@ namespace PfeManagement.WebApi.Controllers
                     return NotFound(new { success = false, message = "Project not found for current user" });
                 }
 
-                var project = await _db.Projects.Include(p => p.Contributors).FirstOrDefaultAsync(p => p.Id == projectId.Value);
-                if (project == null) throw new Exception("Project not found");
-
-                if (dto.Title != null) project.Title = dto.Title;
-                if (dto.Description != null) project.Description = dto.Description;
-                if (dto.StartDate.HasValue) project.StartDate = NormalizeUtc(dto.StartDate.Value);
-                if (dto.EndDate.HasValue) project.EndDate = NormalizeUtc(dto.EndDate.Value);
-
-                await _db.SaveChangesAsync();
-
-                return Ok(new { success = true, message = "Project updated successfully", data = MapToDto(project) });
+                var result = await _projectService.UpdateProjectAsync(projectId.Value, dto);
+                return Ok(new { success = true, message = "Project updated successfully", data = result });
             }
             catch (Exception ex)
             {
@@ -135,12 +101,7 @@ namespace PfeManagement.WebApi.Controllers
                     return NotFound(new { success = false, message = "Project not found for current user" });
                 }
 
-                var project = await _db.Projects.FindAsync(projectId.Value);
-                if (project == null) throw new Exception("Project not found");
-
-                _db.Projects.Remove(project);
-                await _db.SaveChangesAsync();
-
+                await _projectService.DeleteProjectAsync(projectId.Value);
                 return Ok(new { success = true, message = "Project deleted successfully" });
             }
             catch (Exception ex)
@@ -154,13 +115,7 @@ namespace PfeManagement.WebApi.Controllers
         [HttpGet("available-students")]
         public async Task<IActionResult> GetAvailableStudents()
         {
-            var students = await _db.Students.Where(s => s.ProjectId == null).ToListAsync();
-            var result = students.Select(s => new ContributorDto
-            {
-                Id = s.Id,
-                FullName = s.FullName,
-                Email = s.Email
-            });
+            var result = await _projectService.GetStudentsWithoutProjectAsync();
             return Ok(new { success = true, message = "Students fetched successfully", data = result });
         }
 
@@ -183,20 +138,7 @@ namespace PfeManagement.WebApi.Controllers
                     return NotFound(new { success = false, message = "Project not found for current user" });
                 }
 
-                var project = await _db.Projects.Include(p => p.Contributors).FirstOrDefaultAsync(p => p.Id == projectId.Value);
-                if (project == null) throw new Exception("Project not found");
-
-                foreach (var studentId in dto.StudentIds)
-                {
-                    var student = await _db.Students.FindAsync(studentId);
-                    if (student != null && student.ProjectId == null)
-                    {
-                        student.ProjectId = projectId.Value;
-                        project.Contributors.Add(student);
-                    }
-                }
-                await _db.SaveChangesAsync();
-
+                await _projectService.AddContributorsAsync(projectId.Value, dto, requesterId.Value);
                 return Ok(new { success = true, message = "Contributors added successfully" });
             }
             catch (Exception ex)
@@ -224,20 +166,7 @@ namespace PfeManagement.WebApi.Controllers
                     return NotFound(new { success = false, message = "Project not found for current user" });
                 }
 
-                var project = await _db.Projects.Include(p => p.Contributors).FirstOrDefaultAsync(p => p.Id == projectId.Value);
-                if (project == null) throw new Exception("Project not found");
-
-                foreach (var studentId in dto.StudentIds)
-                {
-                    var student = await _db.Students.FindAsync(studentId);
-                    if (student != null && student.ProjectId == projectId.Value)
-                    {
-                        student.ProjectId = null;
-                        project.Contributors.Remove(student);
-                    }
-                }
-                await _db.SaveChangesAsync();
-
+                await _projectService.RemoveContributorsAsync(projectId.Value, dto, requesterId.Value);
                 return Ok(new { success = true, message = "Contributors removed successfully" });
             }
             catch (Exception ex)
@@ -255,45 +184,25 @@ namespace PfeManagement.WebApi.Controllers
         private async Task<Guid?> GetCurrentStudentIdAsync()
         {
             var userId = GetCurrentUserId();
-            if (!userId.HasValue) return null;
-            var student = await _db.Students.FindAsync(userId.Value);
+            if (!userId.HasValue)
+            {
+                return null;
+            }
+
+            var student = await _unitOfWork.Students.GetByIdAsync(userId.Value);
             return student?.Id;
         }
 
         private async Task<Guid?> GetCurrentProjectIdAsync()
         {
             var studentId = await GetCurrentStudentIdAsync();
-            if (!studentId.HasValue) return null;
-            var student = await _db.Students.FindAsync(studentId.Value);
+            if (!studentId.HasValue)
+            {
+                return null;
+            }
+
+            var student = await _unitOfWork.Students.GetByIdAsync(studentId.Value);
             return student?.ProjectId;
-        }
-
-        private static ProjectResponseDto MapToDto(Project project)
-        {
-            return new ProjectResponseDto
-            {
-                ProjectId = project.Id,
-                Title = project.Title,
-                Description = project.Description,
-                StartDate = project.StartDate,
-                EndDate = project.EndDate,
-                Contributors = project.Contributors.Select(c => new ContributorDto
-                {
-                    Id = c.Id,
-                    FullName = c.FullName,
-                    Email = c.Email
-                }).ToList()
-            };
-        }
-
-        private static DateTime NormalizeUtc(DateTime value)
-        {
-            return value.Kind switch
-            {
-                DateTimeKind.Utc => value,
-                DateTimeKind.Local => value.ToUniversalTime(),
-                _ => DateTime.SpecifyKind(value, DateTimeKind.Utc)
-            };
         }
     }
 }

@@ -4,9 +4,8 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PfeManagement.WebApi.Data;
-using PfeManagement.WebApi.Helpers;
+using PfeManagement.Application.Interfaces;
+using PfeManagement.Domain.Interfaces;
 
 namespace PfeManagement.WebApi.Controllers
 {
@@ -14,34 +13,54 @@ namespace PfeManagement.WebApi.Controllers
     [Route("api")]
     public class UsersController : ControllerBase
     {
-        private readonly AppDbContext _db;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public UsersController(AppDbContext db)
+        public UsersController(IUnitOfWork unitOfWork, IPasswordHasher passwordHasher)
         {
-            _db = db;
+            _unitOfWork = unitOfWork;
+            _passwordHasher = passwordHasher;
         }
 
         [HttpGet("supervisors/company")]
         public async Task<IActionResult> GetCompanySupervisors()
         {
-            var supervisors = await _db.CompanySupervisors.ToListAsync();
+            var supervisors = await _unitOfWork.CompanySupervisors.GetAllAsync();
             var data = supervisors.Select(s => new
             {
-                id = s.Id, fullName = s.FullName, email = s.Email,
-                companyName = s.CompanyName, badgeIMG = s.BadgeIMG
+                id = s.Id,
+                fullName = s.FullName,
+                email = s.Email,
+                companyName = s.CompanyName,
+                badgeIMG = s.BadgeIMG
             });
-            return Ok(new { success = true, message = "Company supervisors fetched successfully", data });
+
+            return Ok(new
+            {
+                success = true,
+                message = "Company supervisors fetched successfully",
+                data
+            });
         }
 
         [HttpGet("supervisors/university")]
         public async Task<IActionResult> GetUniversitySupervisors()
         {
-            var supervisors = await _db.UniversitySupervisors.ToListAsync();
+            var supervisors = await _unitOfWork.UniversitySupervisors.GetAllAsync();
             var data = supervisors.Select(s => new
             {
-                id = s.Id, fullName = s.FullName, email = s.Email, badgeIMG = s.BadgeIMG
+                id = s.Id,
+                fullName = s.FullName,
+                email = s.Email,
+                badgeIMG = s.BadgeIMG
             });
-            return Ok(new { success = true, message = "University supervisors fetched successfully", data });
+
+            return Ok(new
+            {
+                success = true,
+                message = "University supervisors fetched successfully",
+                data
+            });
         }
 
         [Authorize]
@@ -49,19 +68,30 @@ namespace PfeManagement.WebApi.Controllers
         public async Task<IActionResult> GetProfile()
         {
             var userId = TryGetCurrentUserId();
-            if (!userId.HasValue) return Unauthorized(new { success = false, message = "User not authenticated" });
+            if (!userId.HasValue)
+            {
+                return Unauthorized(new { success = false, message = "User not authenticated" });
+            }
 
-            var user = await _db.Users.FindAsync(userId.Value);
-            if (user == null) return NotFound(new { success = false, message = "User not found" });
+            var user = await _unitOfWork.Users.GetByIdAsync(userId.Value);
+            if (user == null)
+            {
+                return NotFound(new { success = false, message = "User not found" });
+            }
 
             return Ok(new
             {
-                success = true, message = "Profile fetched successfully",
+                success = true,
+                message = "Profile fetched successfully",
                 data = new
                 {
-                    id = user.Id, fullName = user.FullName, email = user.Email,
-                    phoneNumber = user.PhoneNumber, role = user.Role.ToString(),
-                    isVerified = user.IsVerified, isActive = user.IsActive
+                    id = user.Id,
+                    fullName = user.FullName,
+                    email = user.Email,
+                    phoneNumber = user.PhoneNumber,
+                    role = user.Role.ToString(),
+                    isVerified = user.IsVerified,
+                    isActive = user.IsActive
                 }
             });
         }
@@ -71,24 +101,40 @@ namespace PfeManagement.WebApi.Controllers
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
         {
             var userId = TryGetCurrentUserId();
-            if (!userId.HasValue) return Unauthorized(new { success = false, message = "User not authenticated" });
+            if (!userId.HasValue)
+            {
+                return Unauthorized(new { success = false, message = "User not authenticated" });
+            }
 
-            var user = await _db.Users.FindAsync(userId.Value);
-            if (user == null) return NotFound(new { success = false, message = "User not found" });
+            var user = await _unitOfWork.Users.GetByIdAsync(userId.Value);
+            if (user == null)
+            {
+                return NotFound(new { success = false, message = "User not found" });
+            }
 
-            if (!PasswordHelper.VerifyPassword(request.CurrentPassword, user.PasswordHash))
+            if (!_passwordHasher.VerifyPassword(request.CurrentPassword, user.PasswordHash))
+            {
                 return BadRequest(new { success = false, message = "Current password is incorrect" });
+            }
 
-            user.PasswordHash = PasswordHelper.HashPassword(request.NewPassword);
-            await _db.SaveChangesAsync();
+            user.PasswordHash = _passwordHasher.HashPassword(request.NewPassword);
+            await _unitOfWork.Users.UpdateAsync(user);
+            await _unitOfWork.SaveChangesAsync();
 
             return Ok(new { success = true, message = "Password updated successfully" });
         }
 
         private Guid? TryGetCurrentUserId()
         {
-            var sub = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
-            return Guid.TryParse(sub, out var id) ? id : null;
+            var subClaim = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                           ?? User.FindFirstValue("sub");
+
+            if (Guid.TryParse(subClaim, out var userId))
+            {
+                return userId;
+            }
+
+            return null;
         }
 
         public class ChangePasswordRequest

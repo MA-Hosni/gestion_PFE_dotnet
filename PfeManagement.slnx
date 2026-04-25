@@ -1,3 +1,6 @@
 <Solution>
+  <Project Path="PfeManagement.Application/PfeManagement.Application.csproj" />
+  <Project Path="PfeManagement.Domain/PfeManagement.Domain.csproj" />
+  <Project Path="PfeManagement.Infrastructure/PfeManagement.Infrastructure.csproj" />
   <Project Path="PfeManagement.WebApi/PfeManagement.WebApi.csproj" />
 </Solution>

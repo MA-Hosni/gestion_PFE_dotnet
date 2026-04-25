@@ -1,0 +1,15 @@
+C:\Users\Skymi\Desktop\gestion_PFE\backend dotnet\PfeManagement.Application\bin\Debug\net10.0\PfeManagement.Application.deps.json
+C:\Users\Skymi\Desktop\gestion_PFE\backend dotnet\PfeManagement.Application\bin\Debug\net10.0\PfeManagement.Application.dll
+C:\Users\Skymi\Desktop\gestion_PFE\backend dotnet\PfeManagement.Application\bin\Debug\net10.0\PfeManagement.Application.pdb
+C:\Users\Skymi\Desktop\gestion_PFE\backend dotnet\PfeManagement.Application\bin\Debug\net10.0\PfeManagement.Domain.dll
+C:\Users\Skymi\Desktop\gestion_PFE\backend dotnet\PfeManagement.Application\bin\Debug\net10.0\PfeManagement.Domain.pdb
+C:\Users\Skymi\Desktop\gestion_PFE\backend dotnet\PfeManagement.Application\obj\Debug\net10.0\PfeManagement.Application.csproj.AssemblyReference.cache
+C:\Users\Skymi\Desktop\gestion_PFE\backend dotnet\PfeManagement.Application\obj\Debug\net10.0\PfeManagement.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Skymi\Desktop\gestion_PFE\backend dotnet\PfeManagement.Application\obj\Debug\net10.0\PfeManagement.Application.AssemblyInfoInputs.cache
+C:\Users\Skymi\Desktop\gestion_PFE\backend dotnet\PfeManagement.Application\obj\Debug\net10.0\PfeManagement.Application.AssemblyInfo.cs
+C:\Users\Skymi\Desktop\gestion_PFE\backend dotnet\PfeManagement.Application\obj\Debug\net10.0\PfeManagement.Application.csproj.CoreCompileInputs.cache
+C:\Users\Skymi\Desktop\gestion_PFE\backend dotnet\PfeManagement.Application\obj\Debug\net10.0\PfeManag.F80F7338.Up2Date
+C:\Users\Skymi\Desktop\gestion_PFE\backend dotnet\PfeManagement.Application\obj\Debug\net10.0\PfeManagement.Application.dll
+C:\Users\Skymi\Desktop\gestion_PFE\backend dotnet\PfeManagement.Application\obj\Debug\net10.0\refint\PfeManagement.Application.dll
+C:\Users\Skymi\Desktop\gestion_PFE\backend dotnet\PfeManagement.Application\obj\Debug\net10.0\PfeManagement.Application.pdb
+C:\Users\Skymi\Desktop\gestion_PFE\backend dotnet\PfeManagement.Application\obj\Debug\net10.0\ref\PfeManagement.Application.dll

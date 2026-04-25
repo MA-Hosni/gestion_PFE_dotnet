@@ -1,11 +1,22 @@
 using System.Text;
 using System.Text.Json.Serialization;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using PfeManagement.WebApi.Data;
+// Removed Microsoft.OpenApi.Models OpenApi references
+using PfeManagement.Application.EventHandlers;
+using PfeManagement.Application.Factories;
+using PfeManagement.Application.Interfaces;
+using PfeManagement.Application.Services;
+using PfeManagement.Application.Strategies;
+using PfeManagement.Domain.Events;
+using PfeManagement.Domain.Interfaces;
+using PfeManagement.Infrastructure.Data;
+using PfeManagement.Infrastructure.Repositories;
+using PfeManagement.Infrastructure.Services;
 using AspNetCoreRateLimit;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,12 +27,51 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
+// Swagger temporarily removed due to package issue
 
-// DbContext - just register it directly, no repository/unit of work layers
+// DbContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
+
+// Dependency Injection: Domain & Infrastructure
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<INotificationService, EmailNotificationAdapter>();
+builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
+builder.Services.AddScoped<IPasswordHasher, PasswordHasherService>();
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+
+// Dependency Injection: Application Services
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<ISprintService, SprintService>();
+builder.Services.AddScoped<IUserStoryService, UserStoryService>();
+builder.Services.AddScoped<IValidationService, ValidationService>();
+builder.Services.AddScoped<IMeetingService, MeetingService>();
+builder.Services.AddScoped<IReportService, ReportService>();
+
+// Dependency Injection: Factory Method
+builder.Services.AddScoped<StudentFactory>();
+builder.Services.AddScoped<CompanySupervisorFactory>();
+builder.Services.AddScoped<UniversitySupervisorFactory>();
+builder.Services.AddScoped<UserFactory>(provider => provider.GetRequiredService<StudentFactory>()); // Sample default
+
+// Dependency Injection: Observer Pattern (Event Dispatcher & Handlers)
+builder.Services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
+builder.Services.AddScoped<IDomainEventHandler<TaskStatusChangedEvent>, TaskHistoryHandler>();
+builder.Services.AddScoped<IDomainEventHandler<TaskStatusChangedEvent>, SupervisorNotificationHandler>();
+// A simple dispatcher implementation would go here, we'll implement it manually or map directly.
+
+// Dependency Injection: Strategy Pattern
+builder.Services.AddScoped<IValidationStrategy, ReunionValidationStrategy>();
+builder.Services.AddScoped<IValidationStrategy, HorsReunionValidationStrategy>();
+
+// FluentValidation
+builder.Services.AddValidatorsFromAssembly(typeof(PfeManagement.Application.Validators.SprintValidator).Assembly);
 
 // JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -64,6 +114,16 @@ builder.Services.AddInMemoryRateLimiting();
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
 var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+//    app.UseSwagger();
+// app.UseSwaggerUI();
+}
+
+// Exception Middleware would be registered here
+// app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.UseCors("AllowFrontend");
 

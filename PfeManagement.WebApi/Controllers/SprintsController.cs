@@ -1,12 +1,11 @@
 using System;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PfeManagement.WebApi.Data;
-using PfeManagement.WebApi.Models;
+using PfeManagement.Application.DTOs.Sprints;
+using PfeManagement.Application.Interfaces;
+using PfeManagement.Domain.Interfaces;
 
 namespace PfeManagement.WebApi.Controllers
 {
@@ -14,11 +13,13 @@ namespace PfeManagement.WebApi.Controllers
     [Route("api/project/sprints")]
     public class SprintsController : ControllerBase
     {
-        private readonly AppDbContext _db;
+        private readonly ISprintService _sprintService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public SprintsController(AppDbContext db)
+        public SprintsController(ISprintService sprintService, IUnitOfWork unitOfWork)
         {
-            _db = db;
+            _sprintService = sprintService;
+            _unitOfWork = unitOfWork;
         }
 
         [Authorize]
@@ -34,26 +35,8 @@ namespace PfeManagement.WebApi.Controllers
                     return NotFound(new { success = false, message = "Project not found for current user" });
                 }
 
-                var project = await _db.Projects.FindAsync(effectiveProjectId.Value);
-                if (project == null) throw new Exception("Project not found");
-
-                var existingSprints = await _db.Sprints.Where(s => s.ProjectId == effectiveProjectId.Value).ToListAsync();
-                var nextIndex = existingSprints.Any() ? existingSprints.Max(s => s.OrderIndex) + 1 : 1;
-
-                var sprint = new Sprint
-                {
-                    Title = dto.Title,
-                    Goal = dto.Goal,
-                    StartDate = NormalizeUtc(dto.StartDate),
-                    EndDate = NormalizeUtc(dto.EndDate),
-                    OrderIndex = nextIndex,
-                    ProjectId = effectiveProjectId.Value
-                };
-
-                _db.Sprints.Add(sprint);
-                await _db.SaveChangesAsync();
-
-                return StatusCode(201, new { success = true, message = "Sprint created successfully", data = MapToDto(sprint) });
+                var result = await _sprintService.CreateSprintAsync(dto, effectiveProjectId.Value);
+                return StatusCode(201, new { success = true, message = "Sprint created successfully", data = result });
             }
             catch (Exception ex)
             {
@@ -74,8 +57,8 @@ namespace PfeManagement.WebApi.Controllers
                     return NotFound(new { success = false, message = "Project not found for current user" });
                 }
 
-                var sprints = await _db.Sprints.Where(s => s.ProjectId == effectiveProjectId.Value).OrderBy(s => s.OrderIndex).ToListAsync();
-                return Ok(new { success = true, message = "Sprints fetched successfully", data = sprints.Select(MapToDto) });
+                var result = await _sprintService.GetSprintsAsync(effectiveProjectId.Value);
+                return Ok(new { success = true, message = "Sprints fetched successfully", data = result });
             }
             catch (Exception ex)
             {
@@ -90,17 +73,8 @@ namespace PfeManagement.WebApi.Controllers
         {
             try
             {
-                var sprint = await _db.Sprints.FindAsync(id);
-                if (sprint == null) throw new Exception("Sprint not found");
-
-                if (dto.Title != null) sprint.Title = dto.Title;
-                if (dto.Goal != null) sprint.Goal = dto.Goal;
-                if (dto.StartDate.HasValue) sprint.StartDate = NormalizeUtc(dto.StartDate.Value);
-                if (dto.EndDate.HasValue) sprint.EndDate = NormalizeUtc(dto.EndDate.Value);
-
-                await _db.SaveChangesAsync();
-
-                return Ok(new { success = true, message = "Sprint updated successfully", data = MapToDto(sprint) });
+            var result = await _sprintService.UpdateSprintAsync(id, dto);
+                return Ok(new { success = true, message = "Sprint updated successfully", data = result });
             }
             catch (Exception ex)
             {
@@ -114,12 +88,7 @@ namespace PfeManagement.WebApi.Controllers
         {
             try
             {
-                var sprint = await _db.Sprints.FindAsync(id);
-                if (sprint == null) throw new Exception("Sprint not found");
-
-                _db.Sprints.Remove(sprint);
-                await _db.SaveChangesAsync();
-
+            await _sprintService.DeleteSprintAsync(id);
                 return Ok(new { success = true, message = "Sprint deleted successfully" });
             }
             catch (Exception ex)
@@ -141,16 +110,7 @@ namespace PfeManagement.WebApi.Controllers
                     return NotFound(new { success = false, message = "Project not found for current user" });
                 }
 
-                foreach (var sprintOrder in dto.Sprints)
-                {
-                    var sprint = await _db.Sprints.FindAsync(sprintOrder.SprintId);
-                    if (sprint != null && sprint.ProjectId == effectiveProjectId.Value)
-                    {
-                        sprint.OrderIndex = sprintOrder.OrderIndex;
-                    }
-                }
-                await _db.SaveChangesAsync();
-
+                await _sprintService.ReorderSprintsAsync(dto, effectiveProjectId.Value);
                 return Ok(new { success = true, message = "Sprints reordered successfully" });
             }
             catch (Exception ex)
@@ -168,32 +128,13 @@ namespace PfeManagement.WebApi.Controllers
         private async Task<Guid?> GetCurrentProjectIdAsync()
         {
             var userId = GetCurrentUserId();
-            if (!userId.HasValue) return null;
-            var student = await _db.Students.FindAsync(userId.Value);
+            if (!userId.HasValue)
+            {
+                return null;
+            }
+
+            var student = await _unitOfWork.Students.GetByIdAsync(userId.Value);
             return student?.ProjectId;
-        }
-
-        private static SprintResponseDto MapToDto(Sprint sprint)
-        {
-            return new SprintResponseDto
-            {
-                Id = sprint.Id,
-                Title = sprint.Title,
-                Goal = sprint.Goal,
-                StartDate = sprint.StartDate,
-                EndDate = sprint.EndDate,
-                OrderIndex = sprint.OrderIndex
-            };
-        }
-
-        private static DateTime NormalizeUtc(DateTime value)
-        {
-            return value.Kind switch
-            {
-                DateTimeKind.Utc => value,
-                DateTimeKind.Local => value.ToUniversalTime(),
-                _ => DateTime.SpecifyKind(value, DateTimeKind.Utc)
-            };
         }
     }
 }

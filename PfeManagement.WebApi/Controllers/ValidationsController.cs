@@ -3,9 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PfeManagement.WebApi.Data;
-using PfeManagement.WebApi.Models;
+using PfeManagement.Application.DTOs.Validations;
+using PfeManagement.Application.Interfaces;
+using PfeManagement.Domain.Interfaces;
 
 namespace PfeManagement.WebApi.Controllers
 {
@@ -13,11 +13,13 @@ namespace PfeManagement.WebApi.Controllers
     [Route("api/validations")]
     public class ValidationsController : ControllerBase
     {
-        private readonly AppDbContext _db;
+        private readonly IValidationService _validationService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ValidationsController(AppDbContext db)
+        public ValidationsController(IValidationService validationService, IUnitOfWork unitOfWork)
         {
-            _db = db;
+            _validationService = validationService;
+            _unitOfWork = unitOfWork;
         }
 
         [Authorize]
@@ -27,56 +29,13 @@ namespace PfeManagement.WebApi.Controllers
             try
             {
                 var validatorId = GetCurrentUserId() ?? Guid.Empty;
-
-                // Inline validation logic (was Strategy pattern before)
-                ValidationRecord record;
-                if (dto.MeetingType == MeetingType.Reunion)
-                {
-                    // Reunion validation - requires meeting reference
-                    if (dto.MeetingReferenceId == null)
-                        throw new Exception("Reunion validation requires a meeting reference");
-
-                    var meeting = await _db.Meetings.FindAsync(dto.MeetingReferenceId.Value);
-                    if (meeting == null)
-                        throw new Exception("Meeting not found");
-
-                    record = new ValidationRecord
-                    {
-                        TaskId = dto.TaskId,
-                        TaskStatus = dto.TaskStatus,
-                        Status = ValidationStatus.Valid,
-                        ValidatorId = validatorId,
-                        MeetingType = MeetingType.Reunion,
-                        MeetingReferenceId = dto.MeetingReferenceId,
-                        Comment = dto.Comment
-                    };
-                }
-                else
-                {
-                    // HorsReunion validation - no meeting reference needed
-                    record = new ValidationRecord
-                    {
-                        TaskId = dto.TaskId,
-                        TaskStatus = dto.TaskStatus,
-                        Status = ValidationStatus.Valid,
-                        ValidatorId = validatorId,
-                        MeetingType = MeetingType.HorsReunion,
-                        MeetingReferenceId = null,
-                        Comment = dto.Comment
-                    };
-                }
-
-                // Update task status
-                var task = await _db.Tasks.FindAsync(dto.TaskId);
-                if (task == null) throw new Exception("Task not found");
-                task.Status = dto.TaskStatus;
-
-                _db.Validations.Add(record);
-                await _db.SaveChangesAsync();
-
-                return StatusCode(201, new { success = true, message = "Validation created successfully", data = MapValidation(record) });
+                var result = await _validationService.CreateValidationAsync(dto, validatorId);
+                return StatusCode(201, new { success = true, message = "Validation created successfully", data = MapValidation(result) });
             }
-            catch (Exception ex) { return BadRequest(new { success = false, message = ex.Message }); }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
         }
 
         [Authorize]
@@ -84,8 +43,8 @@ namespace PfeManagement.WebApi.Controllers
         public async Task<IActionResult> GetValidations([FromQuery] Guid? taskId)
         {
             var validations = taskId.HasValue
-                ? await _db.Validations.Where(v => v.TaskId == taskId.Value).ToListAsync()
-                : await _db.Validations.ToListAsync();
+                ? await _unitOfWork.Validations.GetAsync(v => v.TaskId == taskId.Value)
+                : await _unitOfWork.Validations.GetAllAsync();
 
             return Ok(new
             {
@@ -99,25 +58,38 @@ namespace PfeManagement.WebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteValidation(Guid id)
         {
-            var validation = await _db.Validations.FindAsync(id);
-            if (validation == null) return NotFound(new { success = false, message = "Validation not found" });
-            _db.Validations.Remove(validation);
-            await _db.SaveChangesAsync();
+            var validation = await _unitOfWork.Validations.GetByIdAsync(id);
+            if (validation == null)
+            {
+                return NotFound(new { success = false, message = "Validation not found" });
+            }
+
+            await _unitOfWork.Validations.DeleteAsync(validation);
+            await _unitOfWork.SaveChangesAsync();
             return Ok(new { success = true, message = "Validation deleted successfully" });
         }
 
         private Guid? GetCurrentUserId()
         {
             var sub = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type.EndsWith("nameidentifier", StringComparison.OrdinalIgnoreCase))?.Value;
-            return Guid.TryParse(sub, out var id) ? id : null;
+            return Guid.TryParse(sub, out var userId) ? userId : null;
         }
 
-        private static object MapValidation(ValidationRecord v) => new
+        private static object MapValidation(PfeManagement.Domain.Entities.ValidationRecord validation)
         {
-            id = v.Id, taskId = v.TaskId, taskStatus = v.TaskStatus, status = v.Status,
-            validatorId = v.ValidatorId, meetingType = v.MeetingType,
-            meetingReferenceId = v.MeetingReferenceId, comment = v.Comment,
-            createdAt = v.CreatedAt, updatedAt = v.UpdatedAt
-        };
+            return new
+            {
+                id = validation.Id,
+                taskId = validation.TaskId,
+                taskStatus = validation.TaskStatus,
+                status = validation.Status,
+                validatorId = validation.ValidatorId,
+                meetingType = validation.MeetingType,
+                meetingReferenceId = validation.MeetingReferenceId,
+                comment = validation.Comment,
+                createdAt = validation.CreatedAt,
+                updatedAt = validation.UpdatedAt
+            };
+        }
     }
 }
