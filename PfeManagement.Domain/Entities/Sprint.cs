@@ -34,5 +34,24 @@ namespace PfeManagement.Domain.Entities
             UserStories.Add(userStory);
             return userStory;
         }
+
+        public void ValidateUserStoryDueDate(DateTime dueDate)
+        {
+            if (dueDate < StartDate || dueDate > EndDate)
+            {
+                throw new PfeManagement.Domain.Exceptions.DomainConstraintException("[OCL] UserStoriesWithinSprint - la date d'echeance d'une user story doit etre contenue dans les dates du sprint.");
+            }
+        }
+
+        public void ValidateUserStoriesWithinSprint(IEnumerable<UserStory> stories, DateTime candidateStart, DateTime candidateEnd)
+        {
+            foreach (var us in stories)
+            {
+                if (us.DueDate < candidateStart || us.DueDate > candidateEnd)
+                {
+                    throw new PfeManagement.Domain.Exceptions.DomainConstraintException("[OCL] UserStoriesWithinSprint - la date d'echeance d'une user story doit etre contenue dans les dates du sprint.");
+                }
+            }
+        }
     }
 }

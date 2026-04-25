@@ -44,5 +44,20 @@ namespace PfeManagement.Domain.Entities
 
             return totalTasks == 0 ? 0 : (double)completedTasks / totalTasks * 100;
         }
+
+        public void ValidateNoOverlappingSprints(IEnumerable<Sprint> existingSprints, DateTime candidateStart, DateTime candidateEnd, Guid? currentSprintId = null)
+        {
+            foreach (var sprint in existingSprints)
+            {
+                if (currentSprintId.HasValue && sprint.Id == currentSprintId.Value)
+                    continue;
+
+                // Two periods overlap if StartA < EndB and EndA > StartB
+                if (candidateStart < sprint.EndDate && candidateEnd > sprint.StartDate)
+                {
+                    throw new PfeManagement.Domain.Exceptions.DomainConstraintException("[OCL] NonOverlappingSprints - les sprints d'un meme projet ne doivent pas se chevaucher.");
+                }
+            }
+        }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using PfeManagement.Domain.Entities;
 using PfeManagement.Domain.Events;
@@ -5,25 +6,25 @@ using PfeManagement.Domain.Interfaces;
 
 namespace PfeManagement.Application.EventHandlers
 {
-    // GoF Pattern: Observer - Concrete handler for TaskStatusChangedEvent
-    public class TaskHistoryHandler : IDomainEventHandler<TaskStatusChangedEvent>
+    public class TaskCreatedHistoryHandler : IDomainEventHandler<TaskCreatedEvent>
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public TaskHistoryHandler(IUnitOfWork unitOfWork)
+        public TaskCreatedHistoryHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
-        public async Task HandleAsync(TaskStatusChangedEvent domainEvent)
+        public async Task HandleAsync(TaskCreatedEvent domainEvent)
         {
             var history = new TaskHistory
             {
                 TaskId = domainEvent.TaskId,
-                ModifiedById = domainEvent.ChangedByUserId,
-                FieldChanged = "status",
-                OldValue = domainEvent.OldStatus.ToString(),
-                NewValue = domainEvent.NewStatus.ToString()
+                ModifiedById = domainEvent.CreatedByUserId,
+                FieldChanged = "Creation",
+                OldValue = null,
+                NewValue = "Task Created",
+                CreatedAt = DateTime.UtcNow
             };
 
             await _unitOfWork.TaskHistories.AddAsync(history);

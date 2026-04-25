@@ -53,6 +53,8 @@ builder.Services.AddScoped<IUserStoryService, UserStoryService>();
 builder.Services.AddScoped<IValidationService, ValidationService>();
 builder.Services.AddScoped<IMeetingService, MeetingService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<ITaskReportService, TaskReportService>();
+builder.Services.AddScoped<ITaskReportDataAccess>(sp => sp.GetRequiredService<IUnitOfWork>());
 
 // Dependency Injection: Factory Method
 builder.Services.AddScoped<StudentFactory>();
@@ -64,6 +66,8 @@ builder.Services.AddScoped<UserFactory>(provider => provider.GetRequiredService<
 builder.Services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
 builder.Services.AddScoped<IDomainEventHandler<TaskStatusChangedEvent>, TaskHistoryHandler>();
 builder.Services.AddScoped<IDomainEventHandler<TaskStatusChangedEvent>, SupervisorNotificationHandler>();
+builder.Services.AddScoped<IDomainEventHandler<TaskCreatedEvent>, TaskCreatedHistoryHandler>();
+builder.Services.AddScoped<IDomainEventHandler<TaskCreatedEvent>, TaskCreatedNotificationHandler>();
 // A simple dispatcher implementation would go here, we'll implement it manually or map directly.
 
 // Dependency Injection: Strategy Pattern

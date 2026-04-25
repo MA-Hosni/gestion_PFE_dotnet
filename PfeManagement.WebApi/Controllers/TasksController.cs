@@ -15,11 +15,13 @@ namespace PfeManagement.WebApi.Controllers
     {
         private readonly ITaskService _taskService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ITaskReportService _taskReportService;
 
-        public TasksController(ITaskService taskService, IUnitOfWork unitOfWork)
+        public TasksController(ITaskService taskService, IUnitOfWork unitOfWork, ITaskReportService taskReportService)
         {
             _taskService = taskService;
             _unitOfWork = unitOfWork;
+            _taskReportService = taskReportService;
         }
 
         [Authorize]
@@ -28,7 +30,8 @@ namespace PfeManagement.WebApi.Controllers
         {
             try
             {
-                var result = await _taskService.CreateTaskAsync(dto);
+                var createdByUserId = GetCurrentUserId() ?? Guid.Empty;
+                var result = await _taskService.CreateTaskAsync(dto, createdByUserId);
                 return StatusCode(201, new { success = true, message = "Task created successfully", data = result });
             }
             catch (Exception ex)
@@ -144,19 +147,7 @@ namespace PfeManagement.WebApi.Controllers
         [HttpGet("report/{projectId}")]
         public async Task<IActionResult> GetProjectTaskReport(Guid projectId)
         {
-            var sprints = await _unitOfWork.Sprints.GetAsync(s => s.ProjectId == projectId);
-            var sprintIds = sprints.Select(s => s.Id).ToHashSet();
-            var userStories = await _unitOfWork.UserStories.GetAsync(us => sprintIds.Contains(us.SprintId));
-            var storyIds = userStories.Select(us => us.Id).ToHashSet();
-            var tasks = await _unitOfWork.Tasks.GetAsync(t => storyIds.Contains(t.UserStoryId));
-
-            var data = new
-            {
-                projectId,
-                totalTasks = tasks.Count,
-                byStatus = tasks.GroupBy(t => t.Status).ToDictionary(g => g.Key.ToString(), g => g.Count())
-            };
-
+            var data = await _taskReportService.GetProjectTaskReportAsync(projectId);
             return Ok(new { success = true, message = "Project task report generated", data });
         }
 
@@ -164,17 +155,7 @@ namespace PfeManagement.WebApi.Controllers
         [HttpGet("sprintreport/{sprintId}")]
         public async Task<IActionResult> GetSprintTaskReport(Guid sprintId)
         {
-            var userStories = await _unitOfWork.UserStories.GetAsync(us => us.SprintId == sprintId);
-            var storyIds = userStories.Select(us => us.Id).ToHashSet();
-            var tasks = await _unitOfWork.Tasks.GetAsync(t => storyIds.Contains(t.UserStoryId));
-
-            var data = new
-            {
-                sprintId,
-                totalTasks = tasks.Count,
-                byStatus = tasks.GroupBy(t => t.Status).ToDictionary(g => g.Key.ToString(), g => g.Count())
-            };
-
+            var data = await _taskReportService.GetSprintTaskReportAsync(sprintId);
             return Ok(new { success = true, message = "Sprint task report generated", data });
         }
 
