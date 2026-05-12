@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -16,11 +15,16 @@ namespace PfeManagement.WebApi.Controllers
     {
         private readonly IUserStoryService _userStoryService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IProjectManagementFacade _projectManagementFacade;
 
-        public UserStoriesController(IUserStoryService userStoryService, IUnitOfWork unitOfWork)
+        public UserStoriesController(
+            IUserStoryService userStoryService,
+            IUnitOfWork unitOfWork,
+            IProjectManagementFacade projectManagementFacade)
         {
             _userStoryService = userStoryService;
             _unitOfWork = unitOfWork;
+            _projectManagementFacade = projectManagementFacade;
         }
 
         [Authorize]
@@ -48,23 +52,8 @@ namespace PfeManagement.WebApi.Controllers
                 return Ok(new { success = true, message = "User stories fetched successfully", data = Array.Empty<object>() });
             }
 
-            var sprints = await _unitOfWork.Sprints.GetAsync(s => s.ProjectId == projectId.Value);
-            var sprintIds = sprints.Select(s => s.Id).ToHashSet();
-            var stories = await _unitOfWork.UserStories.GetAsync(us => sprintIds.Contains(us.SprintId));
-
-            var data = stories.Select(us => new
-            {
-                id = us.Id,
-                storyName = us.StoryName,
-                description = us.Description,
-                priority = us.Priority,
-                storyPointEstimate = us.StoryPointEstimate,
-                startDate = us.StartDate,
-                dueDate = us.DueDate,
-                sprintId = us.SprintId
-            });
-
-            return Ok(new { success = true, message = "User stories fetched successfully", data });
+            var stories = await _projectManagementFacade.GetUserStoriesForProjectAsync(projectId.Value);
+            return Ok(new { success = true, message = "User stories fetched successfully", data = stories });
         }
 
         [Authorize]

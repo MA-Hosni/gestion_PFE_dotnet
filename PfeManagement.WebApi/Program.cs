@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using PfeManagement.Application.EventHandlers;
+using PfeManagement.Application.Facades;
 using PfeManagement.Application.Factories;
 using PfeManagement.Application.Interfaces;
 using PfeManagement.Application.Services;
@@ -63,6 +64,10 @@ builder.Services.AddScoped<IUserStoryService,  UserStoryService>();
 builder.Services.AddScoped<IValidationService, ValidationService>();
 builder.Services.AddScoped<IMeetingService,    MeetingService>();
 builder.Services.AddScoped<IReportService,     ReportService>();
+builder.Services.AddScoped<ITaskReportService, TaskReportService>();
+
+// ── Facade Pattern (GoF) — orchestration of multi-service workflows ──
+builder.Services.AddScoped<IProjectManagementFacade, ProjectManagementFacade>();
 
 // ── Factory Method (GoF) ──────────────────────────────────────
 builder.Services.AddScoped<StudentFactory>();
