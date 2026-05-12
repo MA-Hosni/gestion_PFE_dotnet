@@ -11,7 +11,7 @@ namespace PfeManagement.Domain.Entities
         public string Description { get; set; } = string.Empty;
         public Priority Priority { get; set; } = Priority.Medium;
         public int StoryPointEstimate { get; set; }
-        
+
         public DateTime StartDate { get; set; }
         public DateTime DueDate { get; set; }
 
@@ -19,5 +19,30 @@ namespace PfeManagement.Domain.Entities
         public virtual Sprint? Sprint { get; set; }
 
         public virtual ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>();
+
+        /// <summary>
+        /// GRASP Creator: UserStory aggregates TaskItem instances for this story.
+        /// </summary>
+        public TaskItem AddTask(
+            string title,
+            string description,
+            TaskItemStatus status,
+            Priority priority,
+            Guid? assignedToId)
+        {
+            var task = new TaskItem
+            {
+                Title = title,
+                Description = description,
+                Status = status,
+                Priority = priority,
+                UserStoryId = Id,
+                UserStory = this,
+                AssignedToId = assignedToId
+            };
+
+            Tasks.Add(task);
+            return task;
+        }
     }
 }

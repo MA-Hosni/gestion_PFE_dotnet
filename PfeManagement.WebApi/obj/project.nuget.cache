@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "00fp8qtPpvU=",
+  "dgSpecHash": "0QTUgaNGlX0=",
   "success": true,
-  "projectFilePath": "C:\\Users\\user\\gl_backend_dotnet\\PfeManagement.WebApi\\PfeManagement.WebApi.csproj",
+  "projectFilePath": "C:\\Users\\user\\projet gl\\gestion_PFE_dotnet\\PfeManagement.WebApi\\PfeManagement.WebApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\user\\.nuget\\packages\\aspnetcoreratelimit\\5.0.0\\aspnetcoreratelimit.5.0.0.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
@@ -61,9 +61,9 @@
       "code": "NU1903",
       "level": "Warning",
       "message": "Le package 'AutoMapper' 12.0.1 présente une vulnérabilité de gravité élevé(e) connue, https://github.com/advisories/GHSA-rvv3-g6hj-g44x.",
-      "projectPath": "C:\\Users\\user\\gl_backend_dotnet\\PfeManagement.WebApi\\PfeManagement.WebApi.csproj",
+      "projectPath": "C:\\Users\\user\\projet gl\\gestion_PFE_dotnet\\PfeManagement.WebApi\\PfeManagement.WebApi.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\user\\gl_backend_dotnet\\PfeManagement.WebApi\\PfeManagement.WebApi.csproj",
+      "filePath": "C:\\Users\\user\\projet gl\\gestion_PFE_dotnet\\PfeManagement.WebApi\\PfeManagement.WebApi.csproj",
       "libraryId": "AutoMapper",
       "targetGraphs": [
         "net10.0"

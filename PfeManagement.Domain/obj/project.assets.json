@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\user\\gl_backend_dotnet\\PfeManagement.Domain\\PfeManagement.Domain.csproj",
+      "projectUniqueName": "C:\\Users\\user\\projet gl\\gestion_PFE_dotnet\\PfeManagement.Domain\\PfeManagement.Domain.csproj",
       "projectName": "PfeManagement.Domain",
-      "projectPath": "C:\\Users\\user\\gl_backend_dotnet\\PfeManagement.Domain\\PfeManagement.Domain.csproj",
+      "projectPath": "C:\\Users\\user\\projet gl\\gestion_PFE_dotnet\\PfeManagement.Domain\\PfeManagement.Domain.csproj",
       "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\user\\gl_backend_dotnet\\PfeManagement.Domain\\obj\\",
+      "outputPath": "C:\\Users\\user\\projet gl\\gestion_PFE_dotnet\\PfeManagement.Domain\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config"

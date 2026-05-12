@@ -20,18 +20,17 @@ namespace PfeManagement.Application.Services
 
         public async Task<UserStoryResponseDto> CreateUserStoryAsync(CreateUserStoryDto dto)
         {
-            var userStory = new UserStory
-            {
-                StoryName = dto.StoryName,
-                Description = dto.Description,
-                Priority = dto.Priority,
-                StoryPointEstimate = dto.StoryPointEstimate,
-                DueDate = NormalizeUtc(dto.DueDate),
-                StartDate = NormalizeUtc(DateTime.UtcNow),
-                SprintId = dto.SprintId
-            };
+            var sprint = await _unitOfWork.Sprints.GetByIdAsync(dto.SprintId);
+            if (sprint == null) throw new Exception("Sprint not found");
 
-            await _unitOfWork.UserStories.AddAsync(userStory);
+            var userStory = sprint.AddUserStory(
+                dto.StoryName,
+                dto.Description,
+                dto.StoryPointEstimate,
+                dto.Priority,
+                NormalizeUtc(dto.DueDate),
+                NormalizeUtc(DateTime.UtcNow));
+
             await _unitOfWork.SaveChangesAsync();
 
             return MapToDto(userStory);

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using PfeManagement.Domain.Common;
+using PfeManagement.Domain.Enums;
 
 namespace PfeManagement.Domain.Entities
 {
@@ -17,20 +18,29 @@ namespace PfeManagement.Domain.Entities
 
         public virtual ICollection<UserStory> UserStories { get; set; } = new List<UserStory>();
 
-        // Creator Pattern: Sprint creates UserStory objects
-        public UserStory AddUserStory(string name, string description, int points, Enums.Priority priority, DateTime due)
+        /// <summary>
+        /// GRASP Creator: Sprint aggregates UserStory instances and owns their lifecycle boundary.
+        /// </summary>
+        public UserStory AddUserStory(
+            string storyName,
+            string description,
+            int storyPointEstimate,
+            Priority priority,
+            DateTime dueDate,
+            DateTime startDateUtc)
         {
             var userStory = new UserStory
             {
-                StoryName = name,
+                StoryName = storyName,
                 Description = description,
-                StoryPointEstimate = points,
+                StoryPointEstimate = storyPointEstimate,
                 Priority = priority,
-                DueDate = due,
-                StartDate = DateTime.UtcNow,
-                SprintId = this.Id
+                DueDate = dueDate,
+                StartDate = startDateUtc,
+                SprintId = Id,
+                Sprint = this
             };
-            
+
             UserStories.Add(userStory);
             return userStory;
         }

@@ -77,10 +77,4 @@ namespace PfeManagement.Application.Interfaces
     {
         Task<DTOs.Reports.ReportResponseDto> ProcessReportAsync(Guid projectId, string filePath, string notes);
     }
-
-    public interface ITaskReportService
-    {
-        Task<ProjectTaskReportDto> GetProjectTaskReportAsync(Guid projectId);
-        Task<SprintTaskReportDto> GetSprintTaskReportAsync(Guid sprintId);
-    }
 }

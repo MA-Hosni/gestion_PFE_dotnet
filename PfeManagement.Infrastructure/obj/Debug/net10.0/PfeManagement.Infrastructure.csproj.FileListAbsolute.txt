@@ -57,3 +57,23 @@ C:\Users\user\gl_backend_dotnet\PfeManagement.Infrastructure\obj\Debug\net10.0\r
 C:\Users\user\gl_backend_dotnet\PfeManagement.Infrastructure\obj\Debug\net10.0\PfeManagement.Infrastructure.pdb
 C:\Users\user\gl_backend_dotnet\PfeManagement.Infrastructure\obj\Debug\net10.0\PfeManagement.Infrastructure.genruntimeconfig.cache
 C:\Users\user\gl_backend_dotnet\PfeManagement.Infrastructure\obj\Debug\net10.0\ref\PfeManagement.Infrastructure.dll
+C:\Users\user\projet gl\gestion_PFE_dotnet\PfeManagement.Infrastructure\obj\Debug\net10.0\PfeManagement.Infrastructure.dll
+C:\Users\user\projet gl\gestion_PFE_dotnet\PfeManagement.Infrastructure\obj\Debug\net10.0\refint\PfeManagement.Infrastructure.dll
+C:\Users\user\projet gl\gestion_PFE_dotnet\PfeManagement.Infrastructure\obj\Debug\net10.0\PfeManagement.Infrastructure.pdb
+C:\Users\user\projet gl\gestion_PFE_dotnet\PfeManagement.Infrastructure\bin\Debug\net10.0\PfeManagement.Infrastructure.deps.json
+C:\Users\user\projet gl\gestion_PFE_dotnet\PfeManagement.Infrastructure\bin\Debug\net10.0\PfeManagement.Infrastructure.runtimeconfig.json
+C:\Users\user\projet gl\gestion_PFE_dotnet\PfeManagement.Infrastructure\bin\Debug\net10.0\PfeManagement.Infrastructure.dll
+C:\Users\user\projet gl\gestion_PFE_dotnet\PfeManagement.Infrastructure\bin\Debug\net10.0\PfeManagement.Infrastructure.pdb
+C:\Users\user\projet gl\gestion_PFE_dotnet\PfeManagement.Infrastructure\bin\Debug\net10.0\PfeManagement.Application.dll
+C:\Users\user\projet gl\gestion_PFE_dotnet\PfeManagement.Infrastructure\bin\Debug\net10.0\PfeManagement.Domain.dll
+C:\Users\user\projet gl\gestion_PFE_dotnet\PfeManagement.Infrastructure\bin\Debug\net10.0\PfeManagement.Domain.pdb
+C:\Users\user\projet gl\gestion_PFE_dotnet\PfeManagement.Infrastructure\bin\Debug\net10.0\PfeManagement.Application.pdb
+C:\Users\user\projet gl\gestion_PFE_dotnet\PfeManagement.Infrastructure\obj\Debug\net10.0\PfeManagement.Infrastructure.csproj.AssemblyReference.cache
+C:\Users\user\projet gl\gestion_PFE_dotnet\PfeManagement.Infrastructure\obj\Debug\net10.0\PfeManagement.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\user\projet gl\gestion_PFE_dotnet\PfeManagement.Infrastructure\obj\Debug\net10.0\PfeManagement.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\user\projet gl\gestion_PFE_dotnet\PfeManagement.Infrastructure\obj\Debug\net10.0\PfeManagement.Infrastructure.AssemblyInfo.cs
+C:\Users\user\projet gl\gestion_PFE_dotnet\PfeManagement.Infrastructure\obj\Debug\net10.0\PfeManagement.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\user\projet gl\gestion_PFE_dotnet\PfeManagement.Infrastructure\obj\Debug\net10.0\PfeManagement.Infrastructure.sourcelink.json
+C:\Users\user\projet gl\gestion_PFE_dotnet\PfeManagement.Infrastructure\obj\Debug\net10.0\PfeManag.5D96479D.Up2Date
+C:\Users\user\projet gl\gestion_PFE_dotnet\PfeManagement.Infrastructure\obj\Debug\net10.0\PfeManagement.Infrastructure.genruntimeconfig.cache
+C:\Users\user\projet gl\gestion_PFE_dotnet\PfeManagement.Infrastructure\obj\Debug\net10.0\ref\PfeManagement.Infrastructure.dll

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PfeManagement.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1f541b3c872d5612958d10bdcf071a9e083b1cb2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c530dd825aa825ac574ad92fda76cace38b7009b")]
 [assembly: System.Reflection.AssemblyProductAttribute("PfeManagement.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PfeManagement.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

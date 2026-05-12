@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PfeManagement.WebApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7c477098c192ce4f9f21e7da89814852e5a8f334")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c530dd825aa825ac574ad92fda76cace38b7009b")]
 [assembly: System.Reflection.AssemblyProductAttribute("PfeManagement.WebApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PfeManagement.WebApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
