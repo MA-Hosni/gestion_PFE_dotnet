@@ -37,7 +37,7 @@ namespace PfeManagement.Application.Services
             var task = await _unitOfWork.Tasks.GetByIdAsync(dto.TaskId);
             if (task == null) throw new Exception("Task not found");
 
-            task.Status = dto.TaskStatus; // Update based on validation
+            task.MoveTo(dto.TaskStatus);
             await _unitOfWork.Tasks.UpdateAsync(task);
 
             await _unitOfWork.Validations.AddAsync(record);

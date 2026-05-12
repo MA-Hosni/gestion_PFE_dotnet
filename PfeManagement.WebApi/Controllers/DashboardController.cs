@@ -42,8 +42,9 @@ namespace PfeManagement.WebApi.Controllers
         }
 
         [Authorize]
+        [HttpGet("student/tasks/blocked")]
         [HttpGet("student/tasks/standby")]
-        public async Task<IActionResult> GetStudentStandbyTasks()
+        public async Task<IActionResult> GetStudentBlockedTasks()
         {
             var userId = GetCurrentUserId();
             if (!userId.HasValue)
@@ -51,8 +52,8 @@ namespace PfeManagement.WebApi.Controllers
                 return Unauthorized(new { success = false, message = "User not authenticated" });
             }
 
-            var tasks = await _unitOfWork.Tasks.GetAsync(t => t.AssignedToId == userId.Value && t.Status == Domain.Enums.TaskItemStatus.ToDo);
-            return Ok(new { success = true, message = "Standby tasks fetched successfully", data = tasks });
+            var tasks = await _unitOfWork.Tasks.GetAsync(t => t.AssignedToId == userId.Value && t.Status == Domain.Enums.TaskItemStatus.Blocked);
+            return Ok(new { success = true, message = "Blocked tasks fetched successfully", data = tasks });
         }
 
         [Authorize]

@@ -4,7 +4,8 @@ namespace PfeManagement.Domain.Enums
     {
         ToDo,
         InProgress,
-        Standby,
+        /// <summary>Previously Standby; same numeric value for existing database rows.</summary>
+        Blocked,
         Done
     }
 }

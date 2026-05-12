@@ -22,11 +22,11 @@ namespace PfeManagement.Domain.Entities
 
         /// <summary>
         /// GRASP Creator: UserStory aggregates TaskItem instances for this story.
+        /// New tasks always start in <see cref="TaskItemStatus.ToDo"/>; further transitions use the State pattern on <see cref="TaskItem"/>.
         /// </summary>
         public TaskItem AddTask(
             string title,
             string description,
-            TaskItemStatus status,
             Priority priority,
             Guid? assignedToId)
         {
@@ -34,12 +34,12 @@ namespace PfeManagement.Domain.Entities
             {
                 Title = title,
                 Description = description,
-                Status = status,
                 Priority = priority,
                 UserStoryId = Id,
                 UserStory = this,
                 AssignedToId = assignedToId
             };
+            task.ApplyTransition(TaskItemStatus.ToDo);
 
             Tasks.Add(task);
             return task;

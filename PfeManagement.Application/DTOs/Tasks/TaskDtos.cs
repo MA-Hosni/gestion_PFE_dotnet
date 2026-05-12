@@ -7,6 +7,7 @@ namespace PfeManagement.Application.DTOs.Tasks
     {
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        /// <summary>Must be <see cref="TaskItemStatus.ToDo"/>; other values are rejected at creation.</summary>
         public TaskItemStatus Status { get; set; }
         public Priority Priority { get; set; }
         public Guid UserStoryId { get; set; }
